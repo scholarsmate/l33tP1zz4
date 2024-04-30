@@ -1,0 +1,146 @@
+/* style.css */
+
+body, html {
+    height: 100%; /* Ensures that the html and body tags take up the full height of the viewport */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text color */
+    font-family: Arial, sans-serif; /* Styling the font */
+}
+
+main {
+    width: 100%; /* Take up the full width of the body */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    height: 100vh; /* Use at least the full height of the viewport */
+}
+
+h1 {
+    font-family: 'Courier New', monospace; /* Classic computer-like feel */
+    color: #ef0606; /* Vibrant red color */
+    text-transform: uppercase; /* CAPITALIZE EVERYTHING */
+    text-shadow: 0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #E0F7FA, 0 0 20px #E0F7FA, 0 0 25px #E0F7FA, 0 0 30px #E0F7FA, 0 0 35px #E0F7FA; /* Neon-like glow effect */
+    font-size: 2.5em; /* Larger font size */
+    letter-spacing: 2px; /* Spacing out letters for better readability and style */
+    text-align: center; /* Ensure text itself is centered if it wraps */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em; /* Adjust font size for smaller devices */
+        text-shadow: 0 0 5px #FFF, 0 0 10px #E0F7FA; /* Reduce glow effect for performance */
+    }
+}
+
+
+form {
+    background-color: #333; /* Slightly lighter background for the form */
+    padding: 20px; /* Padding around the form elements */
+    border-radius: 8px; /* Rounded corners for the form */
+    width: fit-content; /* Ensures the form content dictates the width */
+    margin: auto; /* Centering the form on the page */
+    display: block; /* Ensures form takes up the necessary space */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Adds subtle shadow for depth */
+}
+
+.input-group, .selection-group {
+    margin-bottom: 20px; /* Adds space between the groups */
+    padding: 0 10px; /* Adds padding inside the groups for better spacing */
+}
+
+input, select {
+    background-color: #222; /* Dark background for input fields */
+    color: #fff; /* White text color for input */
+    display: block; /* Makes each input and select take up its own line */
+    width: 100%; /* Ensures they take up the full container width */
+    margin-bottom: 10px; /* Adds space between each input/select */
+    padding: 8px; /* Adds internal padding to make inputs more visually appealing */
+    border: 1px solid #555; /* Adds a subtle border */
+    border-radius: 4px; /* Rounds the corners of the inputs and selects */
+}
+
+.order-total, .modalOrderTotal {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #fff; /* White text color for visibility */
+}
+
+button {
+    background-color: #0a7; /* A green background for the button */
+    color: #fff; /* White text */
+    padding: 10px 20px; /* Padding inside the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    width: 100%; /* Button takes full width of the form */
+}
+
+button:hover {
+    background-color: #0c9; /* Slightly lighter green on hover */
+}
+
+footer {
+    margin-top: auto; /* Pushes the footer to the bottom */
+    background-color: #282828; /* Darker background for the footer */
+    color: #fff; /* Light text color for contrast */
+    text-align: center;
+    padding: 10px 20px; /* Padding around the text */
+    width: 100%; /* Full width */
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.3); /* Subtle shadow to lift the footer visually */
+}
+
+footer p {
+    margin: 0; /* No default margin */
+    font-size: 0.9rem; /* Suitable font size for footer text */
+}
+
+footer a {
+    color: #4fa8f6; /* Brighter blue for better visibility in dark mode */
+    text-decoration: none; /* No underline by default */
+}
+
+footer a:hover {
+    text-decoration: underline; /* Underline on hover for better user experience */
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.modal-footer {
+    padding: 10px;
+    text-align: right;
+}
+
+.modal-close {
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
