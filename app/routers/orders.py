@@ -1,4 +1,9 @@
 # app/routers/orders.py
+
+"""
+This module defines the routes for managing pizza orders.
+"""
+
 import logging
 import os
 from typing import List
@@ -8,13 +13,13 @@ from fastapi.encoders import jsonable_encoder
 from starlette.templating import Jinja2Templates
 from starlette.websockets import WebSocketDisconnect
 
+from app.connections.connection_manager import get_connection_manager
+from app.database.db import db
 from app.models.pizza import (
     OrderCreate,
     Order,
     PriceRequest,
 )
-from app.database.db import db
-from app.connections.connection_manager import get_connection_manager
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -22,20 +27,32 @@ templates = Jinja2Templates(directory="templates")
 
 @router.on_event("startup")
 async def startup() -> None:
+    """
+    This event handler is called when the application starts up.
+    """
     await db.connect()
 
 
 @router.on_event("shutdown")
 async def shutdown() -> None:
+    """
+    This event handler is called when the application shuts down.
+    """
     await db.close()
 
 
 @router.get("/api/version")
 def get_version():
+    """
+    This route returns the application version.
+    """
     return os.getenv("APP_VERSION", "0.0.0")
 
 
 async def get_pending_orders() -> List[dict]:
+    """
+    This function fetches all pending orders from the database.
+    """
     try:
         sql = """
             SELECT
@@ -80,6 +97,9 @@ async def get_pending_orders() -> List[dict]:
 
 
 async def get_sizes() -> List[dict]:
+    """
+    This function fetches all pizza sizes from the database.
+    """
     try:
         sizes = await db.fetch("SELECT * FROM pizza_sizes")
         return [
@@ -95,6 +115,9 @@ async def get_sizes() -> List[dict]:
 
 
 async def get_styles() -> List[dict]:
+    """
+    This function fetches all pizza styles from the database.
+    """
     query = "SELECT * FROM pizza_styles"
     styles = await db.fetch(query)
     return [
@@ -108,6 +131,9 @@ async def get_styles() -> List[dict]:
 
 
 async def get_toppings() -> List[dict]:
+    """
+    This function fetches all toppings from the database.
+    """
     query = "SELECT * FROM toppings"
     toppings = await db.fetch(query)
     return [
@@ -122,6 +148,9 @@ async def get_toppings() -> List[dict]:
 
 @router.post("/api/orders/", response_model=Order, status_code=status.HTTP_201_CREATED)
 async def add_order(order: OrderCreate) -> dict:
+    """
+    This route creates a new order in the database.
+    """
     try:
         # Calculate total price
         total_price = await calculate_order_price(
@@ -167,14 +196,18 @@ async def add_order(order: OrderCreate) -> dict:
 
         # Return the order data
         return order_data
-    except Exception as e:
-        logging.error(f"Error creating order: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as error:
+        logging.error("Error creating order: %s", error)
+        raise HTTPException(status_code=500, detail=str(error))
 
 
 async def calculate_order_price(
     size_id: int, style_id: int, toppings: List[int]
 ) -> float:
+    """
+    This function calculates the total price of an order based on the pizza size, style,
+    and toppings.
+    """
     price_query = """
 SELECT 
     pizza_sizes.price + pizza_styles.price + COALESCE(SUM(toppings.price), 0) AS total_price
@@ -195,19 +228,25 @@ GROUP BY
 
 @router.post("/api/calculate-price/", response_model=dict)
 async def calculate_price(request: PriceRequest) -> dict:
+    """
+    This route calculates the total price of an order based on the pizza size, style, and toppings.
+    """
     try:
         total_price = await calculate_order_price(
             request.size_id, request.style_id, request.toppings
         )
         # Ensure total_price is sent as a float, not a string
         return {"total_price": float(total_price)}  # Explicitly convert to float
-    except Exception as e:
-        logging.error(f"Error calculating price: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as error:
+        logging.error("Error calculating price: %s", error)
+        raise HTTPException(status_code=500, detail=str(error))
 
 
 @router.get("/", include_in_schema=False)
 async def get_order_form(request: Request) -> templates.TemplateResponse:
+    """
+    This route returns the populated order form template.
+    """
     return templates.TemplateResponse(
         "order_form.j2",
         {
@@ -222,6 +261,9 @@ async def get_order_form(request: Request) -> templates.TemplateResponse:
 
 @router.get("/orders", include_in_schema=False)
 async def get_orders_page(request: Request) -> templates.TemplateResponse:
+    """
+    This route returns the populated order view template.
+    """
     return templates.TemplateResponse(
         "order_view.j2",
         {
@@ -234,13 +276,16 @@ async def get_orders_page(request: Request) -> templates.TemplateResponse:
 
 @router.websocket("/ws/orders")
 async def websocket_endpoint(websocket: WebSocket):
+    """
+    This route handles WebSocket connections for order updates.
+    """
     manager = get_connection_manager()
     await manager.connect(websocket)
     logging.debug("WebSocket connected.")
     try:
         # Send initial orders list upon connection
         initial_orders = await get_pending_orders()
-        logging.debug(f"Sending initial orders: {initial_orders}")
+        logging.debug("Sending initial orders: %s", initial_orders)
         await websocket.send_json(jsonable_encoder({"orders": initial_orders}))
         logging.debug("Sent initial orders")
 
@@ -257,27 +302,32 @@ async def websocket_endpoint(websocket: WebSocket):
 
     except WebSocketDisconnect:
         logging.debug("WebSocket disconnected.")
-    except Exception as e:
-        logging.error("Error in WebSocket: %s", e)
+    except Exception as error:
+        logging.error("Error in WebSocket: %s", error)
     finally:
         logging.debug("Cleaning up WebSocket connection.")
         await manager.disconnect(websocket)
 
 
 async def notify_clients_about_order_update():
+    """
+    This function notifies all connected clients about an order update.
+    """
     try:
         logging.debug("Notifying clients about order update")
         await get_connection_manager().broadcast_json(
             jsonable_encoder({"orders": await get_pending_orders()})
         )
-    except Exception as e:
-        logging.error("Failed to notify clients about order update: %s", e)
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as error:
+        logging.error("Failed to notify clients about order update: %s", error)
+        raise HTTPException(status_code=500, detail=str(error))
 
 
 @router.post("/api/orders/{order_id}/complete")
 async def complete_order(order_id: int):
-    # Logic to mark an order as completed
+    """
+    This route marks an order as completed.
+    """
     await db.execute(
         "UPDATE orders SET status = 'Completed' WHERE order_id = $1", order_id
     )
@@ -287,7 +337,9 @@ async def complete_order(order_id: int):
 
 @router.post("/api/orders/{order_id}/cancel")
 async def cancel_order(order_id: int):
-    # Logic to mark an order as canceled
+    """
+    This route marks an order as canceled.
+    """
     await db.execute(
         "UPDATE orders SET status = 'Canceled' WHERE order_id = $1", order_id
     )

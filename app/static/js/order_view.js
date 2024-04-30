@@ -96,14 +96,14 @@ function connect() {
 }
 
 function completeOrder(orderId) {
-    fetch(`/api/orders/${orderId}/complete`, { method: 'POST' })
+    fetch(`/api/orders/${orderId}/complete`, {method: 'POST'})
         .then(response => response.json())
         .then(data => alert(data.message))
         .catch(error => console.error('Error completing order:', error));
 }
 
 function cancelOrder(orderId) {
-    fetch(`/api/orders/${orderId}/cancel`, { method: 'POST' })
+    fetch(`/api/orders/${orderId}/cancel`, {method: 'POST'})
         .then(response => response.json())
         .then(data => alert(data.message))
         .catch(error => console.error('Error canceling order:', error));

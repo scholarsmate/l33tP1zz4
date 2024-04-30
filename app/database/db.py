@@ -1,5 +1,9 @@
 # app/database/db.py
 
+"""
+This module provides a Database class that interacts with the database.
+"""
+
 import asyncpg
 
 

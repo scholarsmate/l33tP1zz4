@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-document.getElementById('resetForm').addEventListener('click', function() {
+document.getElementById('resetForm').addEventListener('click', function () {
     const form = document.getElementById('orderForm');
     form.reset(); // Reset the form fields to their initial states
 
@@ -125,10 +125,10 @@ document.getElementById('resetForm').addEventListener('click', function() {
     orderTotalSpan.textContent = "$0.00";
 });
 
-document.getElementById('submitOrder').addEventListener('click', function(event) {
+document.getElementById('submitOrder').addEventListener('click', function (event) {
     event.preventDefault(); // Prevent form submission
 
-        const form = document.getElementById('orderForm');
+    const form = document.getElementById('orderForm');
 
     // Check if the form is valid using HTML5 form validation
     if (!form.checkValidity()) {
@@ -155,11 +155,11 @@ document.getElementById('submitOrder').addEventListener('click', function(event)
 });
 
 
-document.getElementById('cancelOrder').addEventListener('click', function() {
+document.getElementById('cancelOrder').addEventListener('click', function () {
     document.getElementById('confirmationModal').style.display = 'none';
 });
 
-document.getElementById('confirmOrder').addEventListener('click', async function() {
+document.getElementById('confirmOrder').addEventListener('click', async function () {
     document.getElementById('confirmationModal').style.display = 'none';
     await submitOrder(); // Ensure this handles the full submission logic.
 });

@@ -1,7 +1,13 @@
+# app/main.py
+
+"""
+This module defines the FastAPI application and includes the orders router.
+"""
+
 from fastapi import FastAPI
-from routers import orders
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+
+from app.routers import orders
 
 app = FastAPI()
 

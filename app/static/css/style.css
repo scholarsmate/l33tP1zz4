@@ -48,7 +48,7 @@ form {
     width: fit-content; /* Ensures the form content dictates the width */
     margin: auto; /* Centering the form on the page */
     display: block; /* Ensures form takes up the necessary space */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Adds subtle shadow for depth */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds subtle shadow for depth */
 }
 
 .input-group, .selection-group {
@@ -94,7 +94,7 @@ footer {
     text-align: center;
     padding: 10px 20px; /* Padding around the text */
     width: 100%; /* Full width */
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.3); /* Subtle shadow to lift the footer visually */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow to lift the footer visually */
 }
 
 footer p {
@@ -120,8 +120,8 @@ footer a:hover {
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
 .modal-content {
