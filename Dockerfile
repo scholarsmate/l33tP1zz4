@@ -1,17 +1,19 @@
 # Use Red Hat Universal Base Image 9 as the base
 FROM registry.access.redhat.com/ubi9/ubi:latest
 
+ARG PYTHON_VERSION=3.11
+
 # Install Python 3 and other essentials
-RUN yum install -y python39 && \
+RUN yum install -y python${PYTHON_VERSION} && \
     yum clean all
 
 # Install pip
-RUN python3.9 -m ensurepip && \
-    python3.9 -m pip install --upgrade pip
+RUN python${PYTHON_VERSION} -m ensurepip && \
+    python${PYTHON_VERSION} -m pip install --upgrade pip
 
 # Set environment variables
 ENV PATH="/opt/venv/bin:$PATH"
-ENV PYTHONPATH="${PYTHONPATH}:/opt/venv/lib/python3.9/site-packages:/app:/"
+ENV PYTHONPATH="${PYTHONPATH}:/opt/venv/lib/python${PYTHON_VERSION}/site-packages:/app:/"
 
 # Imbue the container with the metadata about the application
 ARG APP_VERSION
@@ -21,7 +23,7 @@ ENV APP_VERSION=$APP_VERSION
 WORKDIR /app
 
 # Create a virtual environment to isolate our package dependencies locally
-RUN python3.9 -m venv /opt/venv
+RUN python${PYTHON_VERSION} -m venv /opt/venv
 RUN pip install --upgrade pip
 
 # Install FastAPI, uvicorn, and other dependencies
@@ -45,4 +47,4 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser \
 USER appuser
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "dev", "--host", "0.0.0.0", "--port", "8000"]

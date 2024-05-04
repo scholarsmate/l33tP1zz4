@@ -3,32 +3,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>L337 P1zz4 Sh0p</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L337 P1ZZ4 SH0P</title>
     <link rel="icon" href="/static/img/pizza_slice.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css?version=5.3.3">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/icons/font/bootstrap-icons.css?version=1.11.3">
 </head>
 <body>
-<main>
-    <h1>L337 P1zz4 Sh0p</h1>
+<main class="container mt-5">
+    <h1 class="text-center mb-4">L337 P1ZZ4 SH0P</h1>
     <form id="orderForm">
-        <div class="input-group">
-            <input type="text" id="orderName" placeholder="Order Name" minlength="2" maxlength="100" required>
-            <input type="text" id="phoneNumber" placeholder="Phone Number" required pattern="[0-9]{10}">
+        <div class="mb-3">
+            <label for="orderName" class="form-label">Order Name:</label>
+            <input type="text" class="form-control" id="orderName" placeholder="Enter Order Name" minlength="2"
+                   maxlength="100" required>
         </div>
-        <div class="selection-group">
-            <select id="pizzaSize" required>
+        <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Phone Number:</label>
+            <input type="text" class="form-control" id="phoneNumber" placeholder="Enter Phone Number" required
+                   pattern="[0-9]{10}">
+        </div>
+        <div class="mb-3">
+            <label for="pizzaSize" class="form-label">Pizza Size:</label>
+            <select id="pizzaSize" class="form-select" required>
                 <option value="" disabled selected>Select Size</option>
                 {% for size in pizza_sizes %}
                     <option value="{{ size.id }}">{{ size.name }} - ${{ size.price }}</option>
                 {% endfor %}
             </select>
-            <select id="pizzaStyle" required>
+        </div>
+        <div class="mb-3">
+            <label for="pizzaStyle" class="form-label">Pizza Style:</label>
+            <select id="pizzaStyle" class="form-select" required>
                 <option value="" disabled selected>Select Style</option>
                 {% for style in pizza_styles %}
                     <option value="{{ style.id }}">{{ style.name }} - Add ${{ style.price }}</option>
                 {% endfor %}
             </select>
-            <select id="toppings" multiple required>
+        </div>
+        <div class="mb-3">
+            <label for="toppings" class="form-label">Toppings:</label>
+            <select id="toppings" class="form-select" multiple required>
                 <option value="" disabled selected>Select Toppings</option>
                 <option value="">None</option>
                 {% for topping in toppings %}
@@ -36,35 +52,17 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="order-total">
-            <label for="orderTotal">Order Total: </label>
-            <span id="orderTotal">$0.00</span>
+        <div class="mb-3 text-center">
+            <p class="lead">Order Total: <strong><span id="orderTotal">$0.00</span></strong></p>
         </div>
-        <div id="submit-Form">
-            <button type="submit" id="submitOrder">Place Order</button>
-        </div>
-        <br/>
-        <div id="reset-Form">
-            <button type="reset" id="resetForm">Reset Form</button>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary" id="submitOrder">Place Order</button>
+            <button type="reset" class="btn btn-secondary" id="resetForm">Reset Form</button>
         </div>
     </form>
-    <!-- Modal Structure -->
-    <div id="confirmationModal" class="modal">
-        <!-- Modal Content Part -->
-        <div class="modal-content">
-            <h1>Confirm Order</h1>
-            <p id="modalOrderDetails"></p>
-            <div class="order-total">
-                <p id="modalOrderTotal"></p>
-            </div>
-            <div class="modal-footer">
-                <button id="cancelOrder" class="modal-close">Cancel</button>
-                <button id="confirmOrder" class="modal-close">Confirm Order</button>
-            </div>
-        </div>
-    </div>
 </main>
 {% include 'footer.j2' %}
-<script src="/static/js/order_form.js"></script>
+<script src="/static/js/order_form.js" type="module"></script>
+<script src="/static/js/bootstrap.bundle.min.js?version=5.3.3"></script>
 </body>
 </html>

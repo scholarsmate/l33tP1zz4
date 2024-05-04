@@ -32,9 +32,10 @@ CREATE TABLE IF NOT EXISTS orders
     phone_number VARCHAR(20),
     size_id      INTEGER REFERENCES pizza_sizes (id),
     style_id     INTEGER REFERENCES pizza_styles (id),
-    total_price  DECIMAL(7, 2) NOT NULL,
-    status       VARCHAR(50)   NOT NULL      DEFAULT 'Pending',
-    created_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    price        DECIMAL(7, 2) NOT NULL,
+    status       VARCHAR(50)   NOT NULL      DEFAULT 'pending',
+    created_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create Order Toppings Junction Table
@@ -49,7 +50,8 @@ CREATE TABLE IF NOT EXISTS order_toppings
 INSERT INTO pizza_sizes (name, price)
 VALUES ('Small', 8.00),
        ('Medium', 12.00),
-       ('Large', 15.00);
+       ('Large', 15.00),
+       ('Extra Large', 18.00);
 
 -- Insert initial data into Pizza Styles
 INSERT INTO pizza_styles (name, price)

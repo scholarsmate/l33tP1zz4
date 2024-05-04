@@ -3,8 +3,13 @@
 """
 This module provides a Database class that interacts with the database.
 """
+import logging
+import os
 
 import asyncpg
+
+# Global variable to cache the database connection instance
+DATABASE_INSTANCE = None
 
 
 class Database:
@@ -75,14 +80,14 @@ class Database:
             return await connection.execute(query, *args)
 
 
-# Instantiate and use this Database class in your API logic.
-# TODO: Make connection string configurable
-db = Database("postgresql://postgres:password@db/postgres")
-
-
 def get_database() -> Database:
     """
-    This function gets the database object
-    :return: database object
+    This function gets the database object.
     """
-    return db
+    global DATABASE_INSTANCE
+    if DATABASE_INSTANCE is None:
+        db_url = os.environ["DATABASE_URL"]
+        logging.info("Connecting to database: %s", db_url)
+        DATABASE_INSTANCE = Database(db_url)
+        logging.info("Database connected")
+    return DATABASE_INSTANCE

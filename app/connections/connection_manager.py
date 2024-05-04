@@ -56,6 +56,12 @@ class ConnectionManager:
             else:
                 print(f"Connection {connection} not ready for text messages")
 
+    def connection_count(self):
+        """
+        Returns the number of active WebSocket connections.
+        """
+        return len(self.active_connections)
+
 
 # Initialize the connection manager
 manager = ConnectionManager()

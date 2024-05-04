@@ -3,17 +3,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pending Orders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L337 P1ZZ4 SH0P: 0RD3R5</title>
     <link rel="icon" href="/static/img/pizza_slice.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css?version=5.3.3">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/icons/font/bootstrap-icons.css?version=1.11.3">
 </head>
 <body>
-<main>
-    <h1>Pending Orders</h1>
-    <div id="ordersContainer">
+<main class="container mt-4">
+    <h1 class="mb-3 text-center">pending Orders</h1>
+    <div id="ordersContainer" class="row">
+        <!-- Orders dynamically inserted here via JavaScript -->
     </div>
 </main>
 {% include 'footer.j2' %}
+<script src="/static/js/order_view.js" type="module"></script>
+<script src="/static/js/bootstrap.bundle.min.js?version=5.3.3"></script>
 </body>
-<script src="/static/js/order_view.js"></script>
 </html>

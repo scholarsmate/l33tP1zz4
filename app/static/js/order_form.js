@@ -1,165 +1,148 @@
 // app/static/js/order_form.js
-// This script is used to handle the order form and its submission logic.
-
-function validateOrderForm() {
-    const orderName = document.getElementById('orderName').value.trim();
-    const phoneNumber = document.getElementById('phoneNumber').value.trim();
-    const sizeSelected = document.getElementById('pizzaSize').value;
-    const styleSelected = document.getElementById('pizzaStyle').value;
-
-    if (!orderName || !phoneNumber || !sizeSelected || !styleSelected) {
-        alert("Please complete all required fields.");
-        return false;
-    }
-    return true;
-}
-
-async function submitOrder() {
-    const orderData = {
-        order_name: document.getElementById('orderName').value.trim(),
-        phone_number: document.getElementById('phoneNumber').value.trim(),
-        size_id: parseInt(document.getElementById('pizzaSize').value, 10),
-        style_id: parseInt(document.getElementById('pizzaStyle').value, 10),
-        toppings: Array.from(document.getElementById('toppings').selectedOptions)
-            .map(option => option.value)
-            .filter(value => value)  // Ensure non-empty values
-            .map(Number)  // Convert to numbers, ensuring no invalid entries
-    };
-
-    if (orderData.toppings.includes(NaN)) {
-        alert('Please select valid toppings or none at all.');
-        return;  // Prevent the submission if toppings include NaN
-    }
-
-    const response = await fetch('/api/orders/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
-    });
-
-    const responseBody = await response.text();  // Use text to ensure reading response does not cause error
-    if (!response.ok) {
-        console.error("Failed to submit order", responseBody);
-        alert("Failed to submit order: " + responseBody);
-    } else {
-        console.log("Order submitted successfully!");
-        alert("Order submitted successfully!");
-        document.getElementById('orderForm').reset();  // Optionally reset the form
-        document.getElementById('orderTotal').textContent = "$0.00";  // Reset the order total display
-    }
-}
+import {showAlert} from './alert_modal.js';
 
 document.addEventListener('DOMContentLoaded', function () {
+    const orderNameInput = document.getElementById('orderName');
+    const phoneNumberInput = document.getElementById('phoneNumber');
     const sizeSelect = document.getElementById('pizzaSize');
     const styleSelect = document.getElementById('pizzaStyle');
     const toppingsSelect = document.getElementById('toppings');
     const orderTotalSpan = document.getElementById('orderTotal');
+    const orderForm = document.getElementById('orderForm');
+    const resetFormButton = document.getElementById('resetForm');
+    const submitOrderButton = document.getElementById('submitOrder');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
+        keyboard: false
+    });
+    const modalTitle = document.getElementById('confirmationModalLabel');
+    const confirmButton = document.getElementById('confirmActionButton');
+    const modalOrderDetails = document.getElementById('confirmationModalBody');
+
+    function prepareOrderDetails() {
+        const orderName = orderNameInput.value;
+        const phoneNumber = phoneNumberInput.value;
+        const pizzaSize = sizeSelect.selectedOptions[0].text;
+        const pizzaStyle = styleSelect.selectedOptions[0].text;
+        const toppings = Array.from(document.getElementById('toppings').selectedOptions)
+            .map(option => option.text).join(", ");
+        const orderTotal = orderTotalSpan.textContent;
+
+        return `
+            <div>
+                <p><strong>Order Name:</strong> ${orderName}</p>
+                <p><strong>Phone:</strong> ${phoneNumber}</p>
+                <p><strong>Size:</strong> ${pizzaSize}</p>
+                <p><strong>Style:</strong> ${pizzaStyle}</p>
+                <p><strong>Toppings:</strong> ${toppings}</p>
+                <p><strong>Order Total:</strong> ${orderTotal}</p>
+            </div>
+            `;
+    }
+
+    async function submitOrder() {
+        const orderData = {
+            order_name: orderNameInput.value.trim(),
+            phone_number: phoneNumberInput.value.trim(),
+            size_id: parseInt(sizeSelect.value, 10),
+            style_id: parseInt(styleSelect.value, 10),
+            toppings: Array.from(toppingsSelect.selectedOptions)
+                .map(option => option.value)
+                .filter(value => value)
+                .map(Number)
+        };
+
+        if (orderData.toppings.includes(NaN)) {
+            showAlert('Please select valid toppings or none at all.', "error");
+            return;
+        }
+
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) {
+            const message = 'Failed to submit order';
+            console.error(message, await response.text());
+            showAlert(message, "error");
+        } else {
+            const message = 'Order submitted successfully!';
+            console.log(message);
+            showAlert(message, "info");
+            orderForm.reset();
+            orderTotalSpan.textContent = "$0.00"; // Reset the order total display
+        }
+    }
 
     function fetchOrderPrice() {
         const sizeId = sizeSelect.value;
         const styleId = styleSelect.value;
         const toppings = Array.from(toppingsSelect.selectedOptions).map(opt => opt.value).filter(v => v);
-
-        // Convert toppings to numbers, ignoring any that are NaN
         const toppingsNumbers = toppings.map(Number).filter(v => !isNaN(v));
 
-        // Check if sizeId and styleId are selected
         if (!sizeId || !styleId || isNaN(sizeId) || isNaN(styleId)) {
-            console.log("Selections are incomplete.");
+            console.log("Selections are incomplete");
             orderTotalSpan.textContent = "$0.00";
-            return; // Exit the function if selections are not complete
+            return;
         }
 
-        console.log("Sending price calculation request with:", {sizeId, styleId, toppings: toppingsNumbers});
+        console.log("Sending price calculation request", {sizeId, styleId, toppings: toppingsNumbers});
+        const params = new URLSearchParams({
+            size_id: sizeId,
+            style_id: styleId,
+        });
+        toppings.forEach(topping => params.append('toppings', topping));
 
-        fetch('/api/calculate-price/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                size_id: parseInt(sizeId),
-                style_id: parseInt(styleId),
-                toppings: toppingsNumbers
-            })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch price: ${response.statusText}`);
-                }
-                return response.json();
-            })
+        fetch(`/api/price?${params.toString()}`)
+            .then(response => response.json())
             .then(data => {
-                console.log("Received price calculation response:", data); // Log the whole data object
-                if (typeof data.total_price !== 'number') {
-                    throw new Error("Invalid total_price type received from server");
-                }
-                orderTotalSpan.textContent = `$${data.total_price.toFixed(2)}`;
+                orderTotalSpan.textContent = `$${data.price.toFixed(2)}`;
             })
             .catch(error => {
-                console.error('Error calculating order price:', error);
-                alert('Failed to calculate price. Check console for details.');
+                console.error('Error calculating order price', error);
+                showAlert('Failed to calculate price. Check console for details.', "error");
             });
-
     }
 
-    sizeSelect.addEventListener('change', fetchOrderPrice);
-    styleSelect.addEventListener('change', fetchOrderPrice);
-    toppingsSelect.addEventListener('change', fetchOrderPrice);
-    fetchOrderPrice(); // Initial price fetch
+    // Update the modal title
+    modalTitle.textContent = 'Confirm Order';
 
-});
+    // Add event listener for confirm action button on the confirmation modal
+    confirmButton.onclick = async (event) => {
+        event.preventDefault();
+        confirmModal.hide(); // Hide the modal after submission
+        await submitOrder();
+    };
 
-document.getElementById('resetForm').addEventListener('click', function () {
-    const form = document.getElementById('orderForm');
-    form.reset(); // Reset the form fields to their initial states
+    confirmModal._element.addEventListener('hidden.bs.modal', function () {
+        modalOrderDetails.innerHTML = ''; // Clear the modal content after closing
+    });
 
-    // Manually clear multi-select for toppings if not automatically handled by form.reset()
-    const toppingsSelect = document.getElementById('toppings');
-    Array.from(toppingsSelect.options).forEach(option => option.selected = false);
+    sizeSelect.onchange = fetchOrderPrice;
+    styleSelect.onchange = fetchOrderPrice;
+    toppingsSelect.onchange = fetchOrderPrice;
+    fetchOrderPrice();
 
-    // Reset the order total display
-    const orderTotalSpan = document.getElementById('orderTotal');
-    orderTotalSpan.textContent = "$0.00";
-});
+    // Display the modal with the order details when submit button is clicked
+    submitOrderButton.onclick = async function (event) {
+        event.preventDefault();
+        // Check if the form is valid using HTML5 form validation
+        if (!orderForm.checkValidity()) {
+            orderForm.reportValidity(); // This will show the browser's default validation error messages
+            return; // Stop the function if validation fails
+        }
+        console.log("Displaying confirmation modal");
+        modalOrderDetails.innerHTML = prepareOrderDetails();
+        confirmModal.show();
+    };
 
-document.getElementById('submitOrder').addEventListener('click', function (event) {
-    event.preventDefault(); // Prevent form submission
+    resetFormButton.onclick = function () {
+        orderForm.reset();
+        orderTotalSpan.textContent = "$0.00";
+    };
 
-    const form = document.getElementById('orderForm');
-
-    // Check if the form is valid using HTML5 form validation
-    if (!form.checkValidity()) {
-        form.reportValidity(); // This will show the browser's default validation error messages
-        return; // Stop the function if validation fails
-    }
-
-    // Validate the form first
-    if (!validateOrderForm()) {
-        return; // Stop the function if validation fails
-    }
-
-    // Proceed with displaying the modal if validation passes
-    const size = document.getElementById('pizzaSize').selectedOptions[0].text;
-    const style = document.getElementById('pizzaStyle').selectedOptions[0].text;
-    const toppings = Array.from(document.getElementById('toppings').selectedOptions).map(opt => opt.text).join(", ");
-    const total = document.getElementById('orderTotal').textContent;
-
-    document.getElementById('modalOrderDetails').textContent = `Size: ${size}, Style: ${style}, Toppings: ${toppings}`;
-    document.getElementById('modalOrderTotal').textContent = `Total: ${total}`;
-
-    // Show modal
-    document.getElementById('confirmationModal').style.display = 'block';
-});
-
-
-document.getElementById('cancelOrder').addEventListener('click', function () {
-    document.getElementById('confirmationModal').style.display = 'none';
-});
-
-document.getElementById('confirmOrder').addEventListener('click', async function () {
-    document.getElementById('confirmationModal').style.display = 'none';
-    await submitOrder(); // Ensure this handles the full submission logic.
+    window.onload = function () {
+        orderNameInput.focus();
+    };
 });
