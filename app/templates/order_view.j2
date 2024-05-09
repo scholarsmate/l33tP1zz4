@@ -5,20 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L337 P1ZZ4 SH0P: 0RD3R5</title>
-    <link rel="icon" href="/static/img/pizza_slice.ico" type="image/x-icon">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css?version=5.3.3">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/icons/font/bootstrap-icons.css?version=1.11.3">
+    <link rel="stylesheet" href="/static/dist/common.css">
+    <script src="/static/dist/order_view.js" type="module"></script>
 </head>
 <body>
 <main class="container mt-4">
-    <h1 class="mb-3 text-center">pending Orders</h1>
+    <h1 class="mb-3 text-center">Pending Orders</h1>
+    <div>
+        <small class="text-muted">
+            Order Count: <span id="orderCount">
+                <!-- order count inserted here -->
+            </span><br/>
+            Connection Count: <span id="connectionCount">
+                <!-- connection count inserted here -->
+            </span>
+        </small>
+    </div>
     <div id="ordersContainer" class="row">
         <!-- Orders dynamically inserted here via JavaScript -->
     </div>
 </main>
 {% include 'footer.j2' %}
-<script src="/static/js/order_view.js" type="module"></script>
-<script src="/static/js/bootstrap.bundle.min.js?version=5.3.3"></script>
 </body>
 </html>

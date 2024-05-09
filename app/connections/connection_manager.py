@@ -33,8 +33,8 @@ class ConnectionManager:
         """
         Removes a WebSocket connection from the list of active connections and closes it.
         """
-        await websocket.close()
         self.active_connections.remove(websocket)
+        await websocket.close()
 
     async def broadcast_json(self, data):
         """
@@ -44,7 +44,10 @@ class ConnectionManager:
             if connection.client_state == WebSocketState.CONNECTED:
                 await connection.send_json(data)
             else:
-                print(f"Connection {connection} not ready for JSON messages")
+                self.active_connections.remove(connection)
+                print(
+                    f"Connection {connection} not ready for text messages, removed from active connections"
+                )
 
     async def broadcast_text(self, data: str):
         """
@@ -54,7 +57,10 @@ class ConnectionManager:
             if connection.client_state == WebSocketState.CONNECTED:
                 await connection.send_text(data)
             else:
-                print(f"Connection {connection} not ready for text messages")
+                self.active_connections.remove(connection)
+                print(
+                    f"Connection {connection} not ready for text messages, removed from active connections"
+                )
 
     def connection_count(self):
         """

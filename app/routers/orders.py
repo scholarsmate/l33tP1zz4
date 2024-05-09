@@ -62,7 +62,7 @@ async def get_connection_count() -> dict:
     """
     This route returns the number of active WebSocket connections.
     """
-    return {"count": get_connection_manager().connection_count()}
+    return {"connection_count": get_connection_manager().connection_count()}
 
 
 @router.get("/api/orders", response_model=List[OrderInfo])
@@ -290,6 +290,7 @@ async def get_orders_page(request: Request) -> templates.TemplateResponse:
         {
             "request": request,
             "app_version": get_version(),
+            "connection_count": get_connection_manager().connection_count(),
             "orders_pending": await get_orders(),
         },
     )
@@ -304,12 +305,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     logging.debug("WebSocket connected.")
     try:
-        # Send initial orders list upon connection
-        logging.debug("Sending initial orders")
-        await websocket.send_json(
-            jsonable_encoder({"orders_pending": await get_orders()})
-        )
-        logging.debug("Sent initial orders")
+        await notify_clients_about_order_update()
 
         # Continue to listen for changes or client messages
         while True:
@@ -338,7 +334,12 @@ async def notify_clients_about_order_update():
     try:
         logging.debug("Notifying clients about order update")
         await get_connection_manager().broadcast_json(
-            jsonable_encoder({"orders_pending": await get_orders()})
+            jsonable_encoder(
+                {
+                    "connection_count": get_connection_manager().connection_count(),
+                    "orders_pending": await get_orders(),
+                }
+            )
         )
     except Exception as error:
         logging.error("Failed to notify clients about order update: %s", error)

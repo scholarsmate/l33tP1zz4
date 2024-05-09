@@ -1,0 +1,18 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+  "rules": {
+    // Define your own rules or override from the extends
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "semi": ["error", "never"]
+  }
+}
